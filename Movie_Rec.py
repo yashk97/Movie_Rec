@@ -1,4 +1,5 @@
-from __future__ import print_function
+import random
+
 from flask import Flask, jsonify, request, json
 # from recommend import recommend
 
@@ -13,17 +14,27 @@ def index():
 
 @app.route("/getgenre", methods=['GET', 'POST'])
 def adventure():
-    data = request.get_json(force=True)      #COMMENTED FOR TESTING
-    g = data["genre"]
-    print(g)
+    data = request.get_json(force=True)
+    pref = data["genre"]
+    print pref
+    genres = pref.split(" | ")
+    count = 0
+
     db = MySQLdb.connect("localhost","root","root","mov_rec")
     cursor = db.cursor()
     genre = []
     mname = []
     mid = []
 
-    sql = "SELECT * FROM Movie WHERE mgenre LIKE '%{0}%'".format(g)
+    sql = "SELECT * FROM Movie WHERE "
 
+    for g in genres:
+        if count == 0:
+            sql = sql + 'mgenre like "%' + g + '%"'
+        else:
+            sql = sql + ' or mgenre like "%' + g + '%"'
+        count = count + 1
+    print sql
     try:
         cursor.execute(sql)
         results = cursor.fetchall()
@@ -41,16 +52,18 @@ def adventure():
     db.close()
     js = []
 
+
+    d = list(zip(mid,mname,genre))
+    random.shuffle(d)
+    mid,mname,genre = zip(*d)
     mid = mid[0:100]
     mname = mname[0:100]
     genre = genre[0:100]
-
-
     for a,b,c in zip(mid,mname,genre):
         js1 = { "mid" : a, "mname" : b, "genre" : c}
         js.append(js1)
 
-    hi = { "list" : js}
+    hi = {"list": js}
     return jsonify(hi)
 
 
