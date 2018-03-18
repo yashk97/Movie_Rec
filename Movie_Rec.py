@@ -165,6 +165,16 @@ def genre(genres):
 
     return js
 
+# @app.route('/edit')
+# def edit_profile():
+#     if 'is_authenticated' not in session:
+#         return redirect(url_for('index'))
+#     else:
+#         if request.method == 'GET':
+#             return render_template('edit_profile.html')
+#         else:
+
+
 @app.route('/logout')
 def logout():
     session.pop('email', None)

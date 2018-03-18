@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-{% include 'navbar.html' %}
 <html lang="en">
 <head>
   <title>MoVRec</title>
@@ -10,6 +9,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+{% include 'navbar.html' %}
 
 {% if 'is_authenticated' in session and session['is_authenticated']%}
 
