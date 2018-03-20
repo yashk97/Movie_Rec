@@ -11,12 +11,14 @@ app = Flask(__name__)
 
 @app.route('/index')
 def index():
-   if 'email' in session:
-       print session['email']
-       data = genre(session['pref'])
-   # print data
-       return render_template('index.html',data=data)
-   return render_template('index.html')
+    if 'email' in session:
+        # print session['email']
+        data = genre(session['pref'])
+        # print data
+        return render_template('index.html',data=data)
+
+
+    return render_template('index.html')
 
 @app.route("/login", methods=['GET','POST'])
 def login():
@@ -122,7 +124,7 @@ def genre(genres):
 
     db = MySQLdb.connect("localhost","root","root","mov_rec")
     cursor = db.cursor()
-    genre = []
+    gen = []
     mname = []
     mid = []
 
@@ -134,7 +136,7 @@ def genre(genres):
         else:
             sql = sql + ' or mgenre like "%' + g + '%"'
         count = count + 1
-    print sql
+    # print sql
     try:
         cursor.execute(sql)
         results = cursor.fetchall()
@@ -144,7 +146,7 @@ def genre(genres):
             movie_genre = row[2]
             mid.append(movie_id)
             mname.append(movie_name)
-            genre.append(movie_genre)
+            gen.append(movie_genre)
     except:
         print("Error to fetch data")
 
@@ -153,13 +155,13 @@ def genre(genres):
     js = []
 
 
-    d = list(zip(mid,mname,genre))
+    d = list(zip(mid,mname,gen))
     random.shuffle(d)
-    mid,mname,genre = zip(*d)
+    mid,mname,gen = zip(*d)
     mid = mid[0:100]
     mname = mname[0:100]
-    genre = genre[0:100]
-    for a,b,c in zip(mid,mname,genre):
+    gen = gen[0:100]
+    for a,b,c in zip(mid,mname,gen):
         js1 = { "mid" : a, "mname" : b, "genre" : c}
         js.append(js1)
 
@@ -173,7 +175,17 @@ def genre(genres):
 #         if request.method == 'GET':
 #             return render_template('edit_profile.html')
 #         else:
-
+@app.route('/rating?mid=<int:mid>', methods=['GET'])
+def getrating(mid):
+    print "in get rating"
+    if 'is_authenticated' in session and session['is_authenticated']:
+        print "authenticated"
+        print mid
+        print request.get_json(force=True)
+        # print data
+        return render_template('rating.html')
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
@@ -182,6 +194,7 @@ def logout():
     session.pop('name',None)
     session.pop('is_authenticated',None)
     session.pop('pref',None)
+    session.pop('mid',None)
     return redirect(url_for('index'))
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
