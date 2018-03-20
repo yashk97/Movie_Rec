@@ -22,7 +22,7 @@ app.url_map.converters['regex'] = RegexConverter
 def index():
     if 'email' in session:
         # print session['email']
-        data = genre(session['pref'])
+        data = recommendations(session['pref'])
         # print data
         return render_template('index.html',data=data)
 
@@ -62,15 +62,6 @@ def login():
                 session['pref']=user[5]
                 return redirect(url_for('index'))
 
-            # except:
-            #         print "Error"
-
-            # if(js):
-            #     count = 1
-            # else:
-            #     count = 0
-            #
-            # #c = {"count" : int(count)}
             return redirect(url_for('index'))
 
 
@@ -124,10 +115,7 @@ def register():
             return redirect(url_for('login'))
 
 # @app.route("/getgenre", methods=['GET', 'POST'])
-def genre(genres):
-    # data = request.get_json(force=True)
-    # pref = data["genre"]
-    # print pref
+def recommendations(genres):
     genres = genres.split(" | ")
     count = 0
 
