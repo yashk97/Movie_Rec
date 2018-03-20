@@ -15,22 +15,7 @@
 
     <div class="container">
   <h1 align="center">Welcome to the MoVRec</h1>
-  <table align="center" cellpadding=10 cellspacing=3>
-      <tr>
-          <th>Movie ID</th>
-          <th>Movie Name</th>
-          <th>Genre</th>
-      </tr>
-{#      <form id="rating-form" action="/rating" method="get" role="form" style="display: block;">#}
-      {% for item in data %}
-            <tr class="clickable-row" data-href="/rating"  data-mid="{{item['mid']}}" method=GET>
-                <td>{{ item['mid'] }}</td>
-                <td>{{ item['mname'] }}</td>
-                <td>{{ item['genre'] }}</td>
-            </tr>
-      {% endfor %}
-{#      </form>#}
-  </table>
+  {% include 'movie_list.html' %}
 </div>
 {% else %}
 <div class="container">
@@ -40,14 +25,4 @@
 {% endif %}
 </body>
 
-<script>
-jQuery(document).ready(function($) {
-    $(".clickable-row").click(function() {
-       // window.location = $(this).data("href");
-        var mid = $(this).data("mid");
-{#        alert(mid);#}
-    $.get( $(this).data("href"), { 'mid':mid });
-    });
-});
-</script>
 </html>

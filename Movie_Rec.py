@@ -1,5 +1,5 @@
 import random
-
+from werkzeug.routing import BaseConverter
 from flask import Flask, jsonify, request, json, session, render_template, redirect, url_for
 import bcrypt
 # from recommend import recommend
@@ -8,6 +8,15 @@ import bcrypt
 import MySQLdb
 
 app = Flask(__name__)
+
+
+class RegexConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
+
+
+app.url_map.converters['regex'] = RegexConverter
 
 @app.route('/index')
 def index():
@@ -175,15 +184,70 @@ def genre(genres):
 #         if request.method == 'GET':
 #             return render_template('edit_profile.html')
 #         else:
-@app.route('/rating?mid=<int:mid>', methods=['GET'])
+
+
+
+value = 0
+
+@app.route('/rating/<regex("[0-9]+"):mid>', methods=['GET'])
 def getrating(mid):
-    print "in get rating"
     if 'is_authenticated' in session and session['is_authenticated']:
-        print "authenticated"
+        # print mid
+        movie_genre,movie_name = "", ""
+        global value
+        db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
+        cursor = db.cursor()
+        sql1 = "SELECT * FROM Movie WHERE mid=" + mid
+        sql2 = "SELECT mov_rat FROM Rating WHERE mid=" + mid +" and uid="+ str(session['uid'])
+        # print sql2
+        try:
+            cursor.execute(sql1)
+            row = cursor.fetchone()
+            # print len(row)
+            movie_name = row[1]
+            movie_genre = row[2].split("|")
+
+            cursor.execute(sql2)
+            row = cursor.fetchone()
+            # print row
+            if row is not None:
+                value = int(row[0])
+            else:
+                value = 0
+        except:
+            print("Error to fetch data")
+
+        # disconnect from server
+        db.close()
+        data = { 'mid':mid, 'mname':movie_name, 'mgenre':movie_genre ,'rating':value}
+        return render_template('rating.html', data = data)
+    else:
+        return redirect(url_for('index'))
+
+@app.route('/rating/<regex("[0-9]+"):mid>', methods=['POST'])
+def store_rating(mid):
+    if 'is_authenticated' in session and session['is_authenticated']:
         print mid
-        print request.get_json(force=True)
-        # print data
-        return render_template('rating.html')
+        value = request.form['ratingval']
+        db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
+        cursor = db.cursor()
+        sql1 = "DELETE FROM Rating WHERE uid =" + str(session['uid']) + " and mid = "+ mid
+        # print sql1
+        sql2 = "INSERT INTO Rating values(" + str(session['uid']) + ", " + mid + ", "+ value +")"
+        # print sql2
+        try:
+            cursor.execute(sql1)
+            # print "sql1 done"
+            cursor.execute(sql2)
+            # print "sql2 done"
+
+        except:
+            print("Error to fetch data")
+
+        # disconnect from server
+        db.commit()
+        db.close()
+        return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))
 

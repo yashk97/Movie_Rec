@@ -3,15 +3,67 @@
 <head>
   <title>MoVRec</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link href='{{url_for('static', filename='rating_form/css/style.css')}}' rel="stylesheet" type="text/css" media="all"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+{#    <script src='{{url_for('static', filename='rating_form/js/scripting.js')}}'></script>#}
 </head>
 <body>
 {% include 'navbar.html' %}
 
-<p>{{ data }}</p>
+<h2 style="padding-left: 50px;">Movie Name: {{ data['mname'] }}</h2>
+<h4 style="padding-left: 50px;">Movie Id: {{ data['mid'] }}</h4>
+<h4 style="padding-left: 50px;">
+    Genre:
+{% for genre in data['mgenre'] %}
+    {{ genre + " "}}
+{% endfor %}
+</h4>
 
+<form id="rating-form" action="" method="post" role="form" style="display: block;">
+
+    <div class="row">
+        <div style="padding-left: 65px;">
+        <div class="star-rating">
+        <span class="fa fa-star-o" data-rating="1"></span>
+        <span class="fa fa-star-o" data-rating="2"></span>
+        <span class="fa fa-star-o" data-rating="3"></span>
+        <span class="fa fa-star-o" data-rating="4"></span>
+        <span class="fa fa-star-o" data-rating="5"></span>
+        <input type="hidden" name="ratingval" class="rating-value" value="{{ data['rating'] }}">
+      </div>
+            <input type="submit" name="rating-submit" id="rating-submit" tabindex="4" value="Submit">
+        </div>
+    </div>
+</form>
 </body>
+<script>
+    var $star_rating = $('.star-rating .fa');
+
+var SetRatingStar = function() {
+  return $star_rating.each(function() {
+    if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$star_rating.on('click', function() {
+  $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+  alert($('input[name=ratingval]').val());
+  return SetRatingStar();
+});
+
+SetRatingStar();
+$(document).ready(function() {
+
+});
+</script>
 </html>
