@@ -15,20 +15,7 @@
 
     <div class="container">
   <h1 align="center">Welcome to the MoVRec</h1>
-  <table align="center" cellpadding=10 cellspacing=3>
-      <tr>
-          <th>Movie ID</th>
-          <th>Movie Name</th>
-          <th>Genre</th>
-      </tr>
-      {% for item in data %}
-            <tr>
-                <td>{{ item['mid'] }}</td>
-                <td>{{ item['mname'] }}</td>
-                <td>{{ item['genre'] }}</td>
-            </tr>
-      {% endfor %}
-  </table>
+  {% include 'movie_list.html' %}
 </div>
 {% else %}
 <div class="container">
@@ -37,4 +24,5 @@
 </div>
 {% endif %}
 </body>
+
 </html>

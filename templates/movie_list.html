@@ -1,0 +1,14 @@
+<table align="center" cellpadding=10 cellspacing=3>
+      <tr>
+          <th>Movie ID</th>
+          <th>Movie Name</th>
+          <th>Genre</th>
+      </tr>
+      {% for item in data %}
+            <tr>
+                <td><a href="/rating/{{ item['mid'] }}">{{ item['mid'] }}</a></td>
+                <td>{{ item['mname'] }}</td>
+                <td>{{ item['genre'] }}</td>
+            </tr>
+      {% endfor %}
+  </table>
