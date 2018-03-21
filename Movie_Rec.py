@@ -55,8 +55,6 @@ def login():
             if bcrypt.checkpw(password,user[4]):
                 count = 1
                 session['uid'] = user[0]
-                session['name'] = user[1]
-                # session['age'] = user[2]
                 session['email']=user[3]
                 session['is_authenticated']=True
                 session['pref']=user[5]
@@ -114,6 +112,45 @@ def register():
             db.commit()
             return redirect(url_for('login'))
 
+@app.route('/genre', methods=['GET'])
+def list_by_genre():
+    db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
+    cursor = db.cursor()
+    gen = []
+    mname = []
+    mid = []
+
+    sql = "SELECT * FROM Movie"
+    # print sql
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for row in results:
+            movie_id = int(row[0])
+            movie_name = row[1]
+            movie_genre = row[2]
+            mid.append(movie_id)
+            mname.append(movie_name)
+            gen.append(movie_genre)
+    except:
+        print("Error to fetch data")
+
+    # disconnect from server
+    db.close()
+    js = []
+
+    d = list(zip(mid, mname, gen))
+    random.shuffle(d)
+    mid, mname, gen = zip(*d)
+    mid = mid[0:100]
+    mname = mname[0:100]
+    gen = gen[0:100]
+    for a, b, c in zip(mid, mname, gen):
+        js1 = {"mid": a, "mname": b, "genre": c}
+        js.append(js1)
+
+    return render_template("sort_genre.html",data=js)
+
 # @app.route("/getgenre", methods=['GET', 'POST'])
 def recommendations(genres):
     genres = genres.split(" | ")
@@ -164,16 +201,118 @@ def recommendations(genres):
 
     return js
 
-# @app.route('/edit')
-# def edit_profile():
-#     if 'is_authenticated' not in session:
-#         return redirect(url_for('index'))
-#     else:
-#         if request.method == 'GET':
-#             return render_template('edit_profile.html')
-#         else:
+@app.route('/edit', methods=['GET'])
+def edit_profile():
+    # if 'is_authenticated' not in session:
+    #     return redirect(url_for('index'))
+    # else:
+    db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
+    cursor = db.cursor()
+    uname,age,email="",0,""
+    mid,mname,gen=[],[],[]
+    pref=""
+    sql1 = "select uname,age,email,pref from User where uid="+ str(session['uid'])
+    # sql2 = "select * from Movie having mid in (select mid from Rating where uid={0})".format(str(session['uid']))
+    # print sql2
+    try:
+        cursor.execute(sql1)
+        row = cursor.fetchone()
+        uname= row[0]
+        age = row[1]
+        email = row[2]
+        pref = row[3]
 
+        # cursor.execute(sql2)
+        # results = cursor.fetchall()
+        # for row in results:
+        #     movie_id = int(row[0])
+        #     movie_name = row[1]
+        #     movie_genre = row[2]
+        #     mid.append(movie_id)
+        #     mname.append(movie_name)
+        #     gen.append(movie_genre)
+        # print mid
+    except:
+        print("Error to fetch data")
+    # ratings = {'mid':mid,'mname':mname,'genre':gen}
+    data = {'uname':uname, 'age':age, 'email':email, 'pref':pref}#,'ratings':ratings}
+    # disconnect from server
+    db.close()
+    return render_template('edit_profile.html',data=data)
 
+@app.route('/edit', methods=['POST'])
+def edit_profile_post():
+    if 'is_authenticated' not in session:
+        return redirect(url_for('index'))
+    else:
+        db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
+        cursor = db.cursor()
+        uname, age= request.form['name'],request.form['age']
+        pref = request.form.getlist('pref')
+
+        count = 0
+        preferences = ""
+        for i in pref:
+            if count == 0:
+                preferences = preferences + i
+            else:
+                preferences = preferences + " | " + i
+            count += 1
+        print preferences
+        sql = "Update User set uname='{0}', age={1}, pref='{2}' where uid={3}".format(uname,age,preferences,str(session['uid']))
+        print sql
+        try:
+            cursor.execute(sql)
+        except:
+            print("Error to fetch data")
+        print "update successful"
+        # disconnect from server
+        db.commit()
+        db.close()
+        return redirect(url_for('index'))
+
+@app.route('/rating', methods=['GET'])
+def rating_list():
+    if 'is_authenticated' in session and session['is_authenticated']:
+        db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
+        cursor = db.cursor()
+        gen = []
+        mname = []
+        mid = []
+
+        sql = "SELECT * FROM Movie"
+
+        try:
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            for row in results:
+                movie_id = int(row[0])
+                movie_name = row[1]
+                movie_genre = row[2]
+                mid.append(movie_id)
+                mname.append(movie_name)
+                gen.append(movie_genre)
+        except:
+            print("Error to fetch data")
+
+        # disconnect from server
+        db.close()
+        js = []
+
+        d = list(zip(mid, mname, gen))
+        random.shuffle(d)
+        mid, mname, gen = zip(*d)
+        mid = mid[0:100]
+        mname = mname[0:100]
+        gen = gen[0:100]
+        for a, b, c in zip(mid, mname, gen):
+            js1 = {"mid": a, "mname": b, "genre": c}
+            js.append(js1)
+
+        return render_template('rating_list.html', data=js)
+
+    else:
+        return redirect(url_for('index'))
 
 value = 0
 
@@ -186,7 +325,7 @@ def getrating(mid):
         db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
         cursor = db.cursor()
         sql1 = "SELECT * FROM Movie WHERE mid=" + mid
-        sql2 = "SELECT mov_rat FROM Rating WHERE mid=" + mid +" and uid="+ str(session['uid'])
+        sql2 = "SELECT rating FROM Rating WHERE mid=" + mid +" and uid="+ str(session['uid'])
         # print sql2
         try:
             cursor.execute(sql1)
@@ -230,12 +369,12 @@ def store_rating(mid):
             # print "sql2 done"
 
         except:
-            print("Error to fetch data")
+            print()
 
         # disconnect from server
         db.commit()
         db.close()
-        return redirect(url_for('index'))
+        return redirect(url_for('rating_list'))
     else:
         return redirect(url_for('index'))
 
@@ -243,10 +382,8 @@ def store_rating(mid):
 def logout():
     session.pop('email', None)
     session.pop('uid',None)
-    session.pop('name',None)
     session.pop('is_authenticated',None)
     session.pop('pref',None)
-    session.pop('mid',None)
     return redirect(url_for('index'))
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'

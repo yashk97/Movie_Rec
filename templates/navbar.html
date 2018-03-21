@@ -3,6 +3,11 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="/index">MoVRec</a>
         </div>
+        <ul class="nav navbar-nav navbar-left">
+            <li><a href="/index">Home</a></li>
+            <li><a href="/rating">Rate Movies</a></li>
+            <li><a href="/genre">List by Genre</a></li>
+        </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if session['is_authenticated'] %}
                 <li><a href="/edit"><span class="glyphicon glyphicon-edit"></span> Edit Profile</a></li>

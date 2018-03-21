@@ -1,12 +1,15 @@
 {% include 'navbar.html' %}
 <!DOCTYPE html>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <link href='{{url_for('static', filename='login_form/css/style.css')}}' rel="stylesheet" type="text/css" media="all"/>
 <script src='{{url_for('static', filename='login_form/js/scripting.js')}}'></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
 <!------ Include the above in your HEAD tag ---------->
 <head></head>
+<html>
 <body>
 <div class="container">
     	<div class="row">
@@ -15,7 +18,7 @@
 					<div class="panel-heading">
 						<div class="row">
 							<div class="col-xs-center">
-								<a href="#edit-form" id="register-form-link">Register</a>
+								<a href="#edit-form" id="register-form-link">Edit Profile</a>
 							</div>
 						</div>
 						<hr>
@@ -25,36 +28,33 @@
 							<div class="col-lg-12">
 								<form id="edit-form" action="" method="post" role="form" style="display: block;">
 									<div class="form-group">
-										<input type="text" name="name" id="name" tabindex="1" class="form-control" placeholder="Name" value="">
+										<input type="text" name="name" id="name" tabindex="1" class="form-control" placeholder="Name" value="{{ data['uname'] }}">
 									</div>
 									<div class="form-group">
-										<input type="email" name="email" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
+										<input type="email" name="email" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="{{ data['email'] }}" readonly>
 									</div>
                                     <div class="form-group">
-										<input type="number" name="age" id="age" tabindex="1" class="form-control" placeholder="Age" value="">
-									</div>
-									<div class="form-group">
-										<input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+										<input type="number" name="age" id="age" tabindex="1" class="form-control" placeholder="Age" value="{{ data['age'] }}">
 									</div>
                                     <div class="form-group">
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Action">Action</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Comedy">Comedy</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Adventure">Adventure</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Animation">Animation</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Children">Children</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Crime">Crime</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Documentary">Documentary</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Drama">Drama</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Fantasy">Fantasy</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Film-Noir">Film-Noir</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Horror">Horror</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Musical">Musical</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Mystery">Mystery</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Romance">Romance</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Sci-Fi">Sci-Fi</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Thriller">Thriller</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="War">War</label>
-                                        <label class="checkbox-inline"><input type="checkbox" name="pref" value="Western">Western</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Action" value="Action">Action</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Comedy" value="Comedy">Comedy</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Adventure" value="Adventure">Adventure</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Animation" value="Animation">Animation</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Children" value="Children">Children</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Crime" value="Crime">Crime</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Documentary" value="Documentary">Documentary</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Drama" value="Drama">Drama</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Fantasy" value="Fantasy">Fantasy</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" id="Film-Noir" value="Film-Noir">Film-Noir</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Horror" value="Horror">Horror</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Musical" value="Musical">Musical</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Mystery" value="Mystery">Mystery</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Romance" value="Romance">Romance</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Sci-Fi" value="Sci-Fi">Sci-Fi</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Thriller" value="Thriller">Thriller</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="War" value="War">War</label>
+                                        <label class="checkbox-inline"><input type="checkbox" name="pref" class="Western" value="Western">Western</label>
 									</div>
                                     <div class="form-group">
 										<div class="row">
@@ -69,6 +69,26 @@
 					</div>
 				</div>
 			</div>
+{#            <div class="col-md-6 col-md-offset-3">#}
+{#                {% include 'movie_list.html' %}#}
+{#            </div>#}
 		</div>
 	</div>
 </body>
+
+<script>
+   window.onload = loadcheck("{{ data['pref'] }}");
+
+       function loadcheck(preferences) {
+{#        var preferences = {{ ','.join(data['pref']) }}#}
+        var x,pref;
+        pref = preferences.split(" | ")
+        console.log(pref)
+        for(x in pref){
+            document.getElementById(pref[x]).checked = true;
+        }
+        console.log('done')
+    }
+
+</script>
+</html>
