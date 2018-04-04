@@ -4,9 +4,11 @@
           <a class="navbar-brand" href="/index">MoVRec</a>
         </div>
         <ul class="nav navbar-nav navbar-left">
-            <li><a href="/index">Home</a></li>
-            <li><a href="/rating">Rate Movies</a></li>
-            <li><a href="/genre">List by Genre</a></li>
+            {% if session['is_authenticated'] %}
+                <li><a href="/index">Home</a></li>
+                <li><a href="/rating">Rate Movies</a></li>
+                <li><a href="/genre">List by Genre</a></li>
+            {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if session['is_authenticated'] %}

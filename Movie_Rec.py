@@ -1,14 +1,12 @@
-from collections import namedtuple, defaultdict
-
-from sklearn.neighbors import NearestNeighbors
+from collections import namedtuple
 from werkzeug.routing import BaseConverter
 from flask import Flask, jsonify, request, session, render_template, redirect, url_for
+from get_recommendations import get_recommendations
+
 import random
-import scipy.sparse as sp
 import bcrypt
 import MySQLdb
 import numpy as np
-
 app = Flask(__name__)
 
 
@@ -22,7 +20,7 @@ app.url_map.converters['regex'] = RegexConverter
 
 @app.route('/index')
 def index():
-    if 'email' in session:
+    if 'uid' in session:
         # print session['email']
         data = list_rec()
         # print data
@@ -40,8 +38,7 @@ def login():
             return render_template('login.html')
         else:
             print("Connected")
-            # data2= request.get_json(force=True)
-            # print data2       #COMMENTED FOR TESTING
+            error = None
             email = request.form["email"]
             print email
             password = request.form["password"]
@@ -53,15 +50,16 @@ def login():
             # try:
             cursor.execute(sql)
             user = cursor.fetchone()
-            if bcrypt.checkpw(password,user[4]):
+            print user
+            if (user is not None) and bcrypt.checkpw(password,user[4]):
                 count = 1
                 session['uid'] = user[0]
-                session['email']=user[3]
                 session['is_authenticated']=True
                 session['pref']=user[5]
                 return redirect(url_for('index'))
-
-            return redirect(url_for('index'))
+            else:
+                error = "invalid login/password"
+                return render_template('login.html',error=error)
 
 
 
@@ -173,62 +171,6 @@ def read_ratings():
         print "Error"
 
 
-def create_training_sets(ratings, n_training, n_testing, user):
-    print "Creating user movie-interaction lists"
-
-    user_interactions = defaultdict(set)
-    max_movie_id = 0
-    for r in ratings:
-        user_interactions[r.user_id].add(r.movie_id)
-        max_movie_id = max(max_movie_id, r.movie_id)
-
-    # print sorted(user_interactions[530])
-    user_interactions = list(user_interactions.values())
-    # print len(user_interactions),len()
-    sampled_indices =range(len(user_interactions)) #random.sample(xrange(len(user_interactions)), n_training + n_testing)
-    # print sorted(sampled_indices), user
-    sampled_indices.remove(user)
-
-    users = []
-    movies = []
-    interactions = []
-    for new_user_id, idx in enumerate(sampled_indices):
-        users.extend([new_user_id] * len(user_interactions[idx]))
-        movies.extend(user_interactions[idx])
-        interactions.extend([1.] * len(user_interactions[idx]))
-
-    n_movies = max_movie_id + 1
-    training_matrix = sp.coo_matrix((interactions, (users, movies)),
-                               shape=(n_training, n_movies)).tocsr()
-
-    users = []
-    movies = []
-    interactions = []
-    users.extend([0] * len(user_interactions[user]))
-    movies.extend(user_interactions[user])
-    interactions.extend([1.] * len(user_interactions[user]))
-
-    n_movies = max_movie_id + 1
-    testing_matrix = sp.coo_matrix((interactions, (users, movies)),
-                               shape=(n_testing, n_movies)).tocsr()
-
-    return training_matrix, testing_matrix
-
-def get_recommendations(training, testing):
-    knn = NearestNeighbors(metric='euclidean', algorithm="brute")
-    knn.fit(training)
-    user = testing.toarray()
-    others = training.toarray()
-    neighbors = knn.kneighbors(user, n_neighbors=10, return_distance=False)
-    print neighbors
-    db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
-    cursor = db.cursor()
-    for neighbor in neighbors[0]:
-        rec_mov = np.where(np.logical_and(np.invert(user == 1), others[neighbor]))[1] + 1
-        format_strings = ','.join(['%s'] * len(rec_mov))
-        cursor.execute("SELECT * FROM Movie WHERE mid IN (%s)" % format_strings, tuple(rec_mov))
-
-
 def get_rec_by_genre(genres):
     count = 0
     gen = []
@@ -262,37 +204,31 @@ def get_rec_by_genre(genres):
 
     db.close()
     d = list(zip(mid,mname,gen))
-    return random.shuffle(d)
+    random.shuffle(d)
+    return d
 
 def list_rec():
 
     db = MySQLdb.connect("localhost","root","root","mov_rec")
     cursor = db.cursor()
     d = []
-    sql_num_of_user_ratings = "SELECT count(*) FROM Rating WHERE uid = {}", format(str(session['uid']))
-    sql_total_ratings = "SELECT count(*) FROM Rating"
+    sql_num_of_user_ratings = "SELECT count(*) FROM Rating WHERE uid = "+str(session['uid'])
+    print sql_num_of_user_ratings
     try:
-        cursor.execute(sql_total_ratings)
-        total_ratings = cursor.fetchone()
-
         cursor.execute(sql_num_of_user_ratings)
-        n = cursor.fetchone()
+        n = cursor.fetchone()[0]
         if n > 0:
-            ratings = read_ratings()
 
-            training, testing = create_training_sets(ratings, total_ratings, 1, session['uid'])
-
-            get_recommendations(training,testing)
+            d = get_recommendations(session['uid'])
         else:
             genres = session['pref']
             genres = genres.split(" | ")
             d = get_rec_by_genre(genres)
+            print d
     except:
         print "error"
 
     js = []
-
-
 
     mid,mname,gen = zip(*d)
     mid = mid[0:100]
@@ -350,7 +286,7 @@ def edit_profile_post():
     else:
         db = MySQLdb.connect("localhost", "root", "root", "mov_rec")
         cursor = db.cursor()
-        uname, age= request.form['name'],request.form['age']
+        uname, age = request.form['name'],request.form['age']
         pref = request.form.getlist('pref')
 
         count = 0
@@ -483,7 +419,6 @@ def store_rating(mid):
 
 @app.route('/logout')
 def logout():
-    session.pop('email', None)
     session.pop('uid',None)
     session.pop('is_authenticated',None)
     session.pop('pref',None)

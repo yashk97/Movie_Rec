@@ -1,10 +1,15 @@
 {% include 'navbar.html' %}
 <!DOCTYPE html>
+<html>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+
 <link href='{{url_for('static', filename='login_form/css/style.css')}}' rel="stylesheet" type="text/css" media="all"/>
 <script src='{{url_for('static', filename='login_form/js/scripting.js')}}'></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <!------ Include the above in your HEAD tag ---------->
 <head></head>
 <body>
@@ -72,3 +77,51 @@
 		</div>
 	</div>
 </body>
+<script>
+$(document).ready(function() {
+  // Initialize form validation on the registration form.
+  // It has the name attribute "registration"
+  $("form[id='register-form']").validate({
+    // Specify validation rules
+    rules: {
+      // The key name on the left side is the name attribute
+      // of an input field. Validation rules are defined
+      // on the right side
+      name: "required",
+      email: {
+        required: true,
+        // Specify that email should be validated
+        // by the built-in "email" rule
+        email: true
+      },
+      age:{
+          required:true
+      },
+      password: {
+        required: true
+      },
+      pref: {
+          required:true
+      }
+    },
+    // Specify validation error messages
+    messages: {
+      name: "Please enter your firstname",
+      age: "Please enter age",
+      password: {
+        required: "Please provide a password"
+      },
+      email: "Please enter a valid email address",
+      pref: {
+        required: "Please select at least one genre"
+      }
+    },
+    // Make sure the form is submitted to the destination defined
+    // in the "action" attribute of the form when valid
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+});
+</script>
+</html>
