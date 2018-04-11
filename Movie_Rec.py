@@ -54,6 +54,7 @@ def login():
             if (user is not None) and bcrypt.checkpw(password,user[4]):
                 count = 1
                 session['uid'] = user[0]
+                session['uname'] = user[1]
                 session['is_authenticated']=True
                 session['pref']=user[5]
                 return redirect(url_for('index'))
@@ -429,6 +430,7 @@ def store_rating(mid):
 @app.route('/logout')
 def logout():
     session.pop('uid',None)
+    session.pop('uname',None)
     session.pop('is_authenticated',None)
     session.pop('pref',None)
     return redirect(url_for('index'))

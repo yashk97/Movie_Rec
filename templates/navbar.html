@@ -12,8 +12,18 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if session['is_authenticated'] %}
-                <li><a href="/edit"><span class="glyphicon glyphicon-edit"></span> Edit Profile</a></li>
-                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+{#                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>#}
+                <li>
+                            <span class="glyphicon glyphicon-user" type="button"
+                                    id="dropdownMenu1" data-toggle="dropdown" style="color: white; padding: 30%">
+                                {{ session['uname'] }}
+                            </span>
+                            <ul class="dropdown-menu">
+                                <li><a href="/edit"><span class="glyphicon glyphicon-edit"></span> Edit Profile</a></li>
+                                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+                            </ul>
+                            <!--</div>-->
+                </li>
             {% else %}
           <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
       <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
