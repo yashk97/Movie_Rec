@@ -119,9 +119,9 @@ def get_recommendations(uid):
     #         print(marked[i],i,"In third for")
 
 
-    print("Max",findmax(marked))
-    final1 = np.argsort(marked)[::-1][:10]
-    r = final1+1
+    print("Max", findmax(marked))
+    final1 = np.argsort(marked)[::-1][:len(np.nonzero(marked)[0])]
+    r = final1 + 1
 
     mname = []
     mgenre = []

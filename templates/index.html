@@ -15,8 +15,32 @@
 
     <div class="container">
   <h1 align="center">Welcome to the MoVRec</h1>
-  {% include 'movie_list.html' %}
+  {% if data is not none %}
+      <h3>Recommendations based on your ratings:</h3>
+    {% include 'movie_list.html' %}
+  {% endif %}
+
+  <h3>Based on your Preferences:</h3>
+  <table id="mov_table1" align="center" cellpadding=10 cellspacing=3>
+      <tr id="heading">
+          <th>Movie ID</th>
+          <th>Movie Name</th>
+          <th>Genre</th>
+      </tr>
+      {% for item in gen_list %}
+            <tr>
+                <td><a href="/rating/{{ item['mid'] }}">{{ item['mid'] }}</a></td>
+                <td>{{ item['mname'] }}</td>
+                <td>{{ item['genre'] }}</td>
+            </tr>
+      {% endfor %}
+  </table>
 </div>
+    <style>
+        table{
+            width:100%;
+        }
+    </style>
 {% else %}
 <div class="container">
   <h1 align="center">Welcome to the MoVRec</h1>

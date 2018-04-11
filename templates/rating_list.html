@@ -11,6 +11,48 @@
 <body>
 {% include 'navbar.html' %}
 <h3 style="padding-left: 150px;">Please select a movie to rate:</h3>
+<h4 style="padding-left: 150px;">Please select a genre:
+  <select id="genre">
+  	<option value="default">Select</option>
+    <option value="Action">Action</option>
+    <option value="Comedy">Comedy</option>
+    <option value="Adventure">Adventure</option>
+    <option value="Animation">Animation</option>
+    <option value="Children">Children</option>
+    <option value="Crime">Crime</option>
+    <option value="Documentary">Documentary</option>
+    <option value="Drama">Drama</option>
+    <option value="Fantasy">Fantasy</option>
+    <option value="Film-Noir">Film-Noir</option>
+    <option value="Horror">Horror</option>
+    <option value="Musical">Musical</option>
+    <option value="Mystery">Mystery</option>
+    <option value="Romance">Romance</option>
+    <option value="Sci-Fi">Sci-Fi</option>
+    <option value="Thriller">Thriller</option>
+    <option value="War">War</option>
+    <option value="Western">Western</option>
+  </select>
+
+  <input type="submit" onclick="sorted()">
+</h4>
 {% include 'movie_list.html' %}
 </body>
+
+<script>
+    function sorted() {
+        var element = document.getElementById('genre');
+        genre = element.options[element.selectedIndex].value;
+        if(genre == 'default') {
+            $('tr').show();
+        }
+        else
+        {   $('tr').show();
+{#            $("#mov_table").find("td:not(:contains('"+genre+"'))").closest('tr').hide();#}
+            $('tr').not($("td:contains('"+genre+"')").parents('tr')).hide();
+            $('#heading').show();
+
+        }
+    }
+</script>
 </html>

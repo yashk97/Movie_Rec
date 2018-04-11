@@ -22,9 +22,9 @@ app.url_map.converters['regex'] = RegexConverter
 def index():
     if 'uid' in session:
         # print session['email']
-        data = list_rec()
+        data,pref_list = list_rec()
         # print data
-        return render_template('index.html',data=data)
+        return render_template('index.html',data=data,gen_list = pref_list)
 
 
     return render_template('index.html')
@@ -139,7 +139,7 @@ def list_by_genre():
     js = []
 
     d = list(zip(mid, mname, gen))
-    random.shuffle(d)
+    # random.shuffle(d)
     mid, mname, gen = zip(*d)
     mid = mid[0:100]
     mname = mname[0:100]
@@ -204,14 +204,15 @@ def get_rec_by_genre(genres):
 
     db.close()
     d = list(zip(mid,mname,gen))
-    random.shuffle(d)
+    # random.shuffle(d)
     return d
 
 def list_rec():
 
     db = MySQLdb.connect("localhost","root","root","mov_rec")
     cursor = db.cursor()
-    d = []
+    data = []
+    pref_list = []
     sql_num_of_user_ratings = "SELECT count(*) FROM Rating WHERE uid = "+str(session['uid'])
     print sql_num_of_user_ratings
     try:
@@ -219,18 +220,19 @@ def list_rec():
         n = cursor.fetchone()[0]
         if n > 0:
 
-            d = get_recommendations(session['uid'])
+            data = get_recommendations(session['uid'])
         else:
-            genres = session['pref']
-            genres = genres.split(" | ")
-            d = get_rec_by_genre(genres)
-            print d
+            data = None
+
+        genres = session['pref']
+        genres = genres.split(" | ")
+        pref_list = get_rec_by_genre(genres)
     except:
         print "error"
 
     js = []
-
-    mid,mname,gen = zip(*d)
+    pref = []
+    mid,mname,gen = zip(*data)
     mid = mid[0:100]
     mname = mname[0:100]
     gen = gen[0:100]
@@ -238,7 +240,14 @@ def list_rec():
         js1 = { "mid" : a, "mname" : b, "genre" : c}
         js.append(js1)
 
-    return js
+    mid, mname, gen = zip(*pref_list)
+    mid = mid[0:100]
+    mname = mname[0:100]
+    gen = gen[0:100]
+    for a, b, c in zip(mid, mname, gen):
+        js1 = {"mid": a, "mname": b, "genre": c}
+        pref.append(js1)
+    return js,pref
 
 @app.route('/edit', methods=['GET'])
 def edit_profile():
@@ -339,7 +348,7 @@ def rating_list():
         js = []
 
         d = list(zip(mid, mname, gen))
-        random.shuffle(d)
+        # random.shuffle(d)
         mid, mname, gen = zip(*d)
         mid = mid[0:100]
         mname = mname[0:100]
